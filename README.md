@@ -1,11 +1,15 @@
 ## Building RTEMS
 
-I built the RTEMS toolchain in this folder like
-specified in the [Quick Start](https://docs.rtems.org/branches/master/user/start/index.html).
+Just a personal repository to build and test the RTEMS tools. Also intended
+for people who want to try out the `rtems-demo` provided by me if the toolchains have not been installed yet.
+
+The RTEMS toolchain is not included here! Instead it should be built in
+this folder from the sources which have been added a submodules.
+The steps are closely related to the steps specified in the [Quick Start](https://docs.rtems.org/branches/master/user/start/index.html).
 
 The toolchain path inside the repository will be referred with `$RTEMS_TOOLS`.
+There is also the RTEMS prefix. In our case, the RTEMS prefix will be equal tothe `$RTEMS_TOOLS` path.
 The RTEMS version number will be referred to as `$RTEMS_VERSION`.
-The path where the RTEMS Toolchains will be installed will be referred to as `$RTEMS_INST`.
 
 ## Prerequisites
 
@@ -41,10 +45,10 @@ and run the following command inside the `$RTEMS_TOOLS` path.
 When using the git sources directly, it is recommended to take the RTEMS version 6.
 
 ```sh
-export RTEMS_INST=$(pwd)/rtems/$RTEMS_VERSION
+export RTEMS_TOOLS=$(pwd)/rtems/$RTEMS_VERSION
 ```
 
-Test with `echo $RTEMS_INST`
+Test with `echo $RTEMS_TOOLS`
 
 ### 2. Obtain the sources
 
@@ -56,8 +60,20 @@ Navigate into `$RTEMS_TOOLS` first.
 ```sh
 mkdir src
 cd src
-git clone git://git.rtems.org/rtems-source-builder.git rsb
-git clone git://git.rtems.org/rtems.git
+git clone https://github.com/rmspacefish/rtems-source-builder.git
+git clone https://github.com/rmspacefish/rtems.git
+```
+
+This was already done in the tools repository.
+I cloned personal forks here because a special change was necessary in the RTEMS sources for the STM32 blinky program, but it is also possible to replace with master branches with the following commands:
+
+```sh
+git rm src/rsb
+git rm src/rtems
+rm -rf .git/modules/src
+cd src
+git submodule add git://git.rtems.org/rtems-source-builder.git rsb
+git submodule add  git://git.rtems.org/rtems.git
 ```
 
 #### Way 2: Package
@@ -74,35 +90,42 @@ mv rtems-source-builder5.1 rsb
 
 ### 3. Installing the RTEMS sparc Tool Suite
 
-A list of available build sats can be shown with with
+First, check whether the `rsb` software is set up properly:
+
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
+../source-builder/sb-check
+```
+
+A list of available build sats can be shown with with.
+```sh
 ../source-builder/sb-set-builder --list-bsets
 ```
 
 Installation is performed with the following command
-as long as the `RTEMS_INST` variable has been set properly.
+as long as the `RTEMS_TOOLS` variable has been set properly.
 Replace 6 with the RTEMS version used. For the git way, 6 was used.
 
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
-../source-builder/sb-set-builder --prefix=$RTEMS_INST $RTEMS_VERSION/rtems-sparc
+../source-builder/sb-set-builder --prefix=$RTEMS_TOOLS $RTEMS_VERSION/rtems-sparc
 ```
 
 Succesfull installation can be verified with
 ```sh
-$RTEMS_INST/bin/sparc-rtems<version>-gcc --version
+$RTEMS_TOOLS/bin/sparc-rtems<version>-gcc --version
 ```
 
 ### 4. Building the erc32 Board Support Package (BSP)
 
+#### Way 1: Package
 After installing the tool suite for the sparc architecture, the BSP for `erc32` should be built to produce binaries which can be run with the `erc32-sis` simulator.
 
 The `sparc/erc32` BSP can be built with the following command (replace 6 with whatever version number is used). Building the test is optional:
 
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
-../source-builder/sb-set-builder --prefix=$RTEMS_INST --target=sparc-rtems6 --with-rtems-bsp=erc32 --with-rtems-tests=yes 6/rtems-kernel
+../source-builder/sb-set-builder --prefix=$RTEMS_TOOLS --target=sparc-rtems6 --with-rtems-bsp=erc32 --with-rtems-tests=yes 6/rtems-kernel
 ```
 
 The BSP tests can be run with the following command
@@ -111,6 +134,30 @@ The BSP tests can be run with the following command
 cd $RTEMS_INST
 bin/rtems-test --rtems-bsp=erc32-sis sparc-rtems6/erc32/tests
 ```
+
+#### Way 2: Sources
+
+The tools required to build `sparc` BSPs have been installed so we can also build the erc32 BSP from sources.
+
+```sh
+cd $RTEMS_TOOLS/src/rtems
+```
+
+Create a `config.ini` file with the following content
+
+```
+[sparc/erc32]
+BUILD_TESTS = True
+```
+
+Run the following command to build the BSP
+
+```sh
+./waf configure --prefix=$RTEMS_TOOLS
+./waf
+./waf install
+```
+
 
 ## Installing RTEMS - STM32H743ZI Nucleo Blinky
 
@@ -125,7 +172,7 @@ git clone https://github.com/rmspacefish/rtems.git
 
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
-../source_builder/sb-set-builder --prefix=$RTEMS_INST $RTEMS_VERSION/rtems-arm
+../source_builder/sb-set-builder --prefix=$RTEMS_TOOLS $RTEMS_VERSION/rtems-arm
 ```
 
 Succesfull installation can be verified with
@@ -152,7 +199,7 @@ following commands
 
 ```sh
 cd $RTEMS_TOOLS/src/rtems
-./waf configure --prefix=$RTEMS_INST 
+./waf configure --prefix=$RTEMS_TOOLS
 ./waf
 ./waf install
 ```
