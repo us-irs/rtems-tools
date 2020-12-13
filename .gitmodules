@@ -1,0 +1,6 @@
+[submodule "src/rsb"]
+	path = src/rsb
+	url = https://github.com/rmspacefish/rtems-source-builder.git
+[submodule "src/rtems"]
+	path = src/rtems
+	url = https://github.com/rmspacefish/rtems.git
