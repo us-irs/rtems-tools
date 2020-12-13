@@ -111,6 +111,7 @@ cd $RTEMS_TOOLS/src/rsb/rtems
 ../source-builder/sb-set-builder --prefix=$RTEMS_TOOLS $RTEMS_VERSION/rtems-sparc
 ```
 
+This command will install the tools at the prefix path.
 Succesfull installation can be verified with
 ```sh
 $RTEMS_TOOLS/bin/sparc-rtems<version>-gcc --version
