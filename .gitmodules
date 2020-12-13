@@ -1,6 +1,8 @@
 [submodule "src/rsb"]
 	path = src/rsb
 	url = https://github.com/rmspacefish/rtems-source-builder.git
+	ignore = dirty
 [submodule "src/rtems"]
 	path = src/rtems
 	url = https://github.com/rmspacefish/rtems.git
+	ignore = dirty
