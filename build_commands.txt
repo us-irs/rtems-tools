@@ -1,0 +1,9 @@
+Build Command Canadian Cross Compiling x86_64:
+
+../source-builder/sb-set-builder --prefix=/c/Users/Robin/RTEMS/rtems-tools/rtems/6 --no-install --bset-tar-file --host=x86_64-w64-mingw32 6/rtems-sparc
+
+Build Command Canadian Cross Compiling i686:
+
+../source-builder/sb-set-builder --prefix=/c/Users/Robin/RTEMS/rtems-tools/rtems/6 --no-install --bset-tar-file --host=i686-w64-mingw32 6/rtems-sparc
+
+
