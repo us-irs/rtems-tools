@@ -7,8 +7,8 @@ The RTEMS toolchain is not included here! Instead it should be built in
 this folder from the sources which have been added a submodules.
 The steps are closely related to the steps specified in the [Quick Start](https://docs.rtems.org/branches/master/user/start/index.html).
 
-The toolchain path inside the repository will be referred with `$RTEMS_TOOLS`.
-There is also the RTEMS prefix. In our case, the RTEMS prefix will be equal tothe `$RTEMS_TOOLS` path.
+The RTEMS prefix where the tools and BSPs will be installed  will be referred with `$RTEMS_PREFIX`.
+The repository will be referred with `$RTEMS_TOOLS_REPO`.
 The RTEMS version number will be referred to as `$RTEMS_VERSION`.
 
 ## Prerequisites
@@ -45,10 +45,10 @@ and run the following command inside the `$RTEMS_TOOLS` path.
 When using the git sources directly, it is recommended to take the RTEMS version 6.
 
 ```sh
-export RTEMS_TOOLS=$(pwd)/rtems/$RTEMS_VERSION
+export RTEMS_PREFIX=$RTEMS_TOOLS_REPO/rtems/$RTEMS_VERSION
 ```
 
-Test with `echo $RTEMS_TOOLS`
+Test with `echo $RTEMS_PREFIX`
 
 ### 2. Obtain the sources
 
@@ -57,24 +57,20 @@ I used the Releases for now as specified in
 Navigate into `$RTEMS_TOOLS` first.
 
 #### Way 1: Git
-```sh
-mkdir src
-cd src
-git clone https://github.com/rmspacefish/rtems-source-builder.git
-git clone https://github.com/rmspacefish/rtems.git
-```
 
-This was already done in the tools repository.
-I cloned personal forks here because a special change was necessary in the RTEMS sources for the STM32 blinky program, but it is also possible to replace with master branches with the following commands:
+The RTEMS sources for the RSB and the kernel are already integrated in this repository as 
+submodules:
 
 ```sh
-git rm src/rsb
-git rm src/rtems
-rm -rf .git/modules/src
+git submodule init
+git submodule sync
+git submodule update
 cd src
-git submodule add git://git.rtems.org/rtems-source-builder.git rsb
-git submodule add  git://git.rtems.org/rtems.git
 ```
+
+The submodules are forks of the RSB and the kernel. It is also possible to replace with master 
+branches by editing the `.gitmodules` file and replacing the URLs with either the master 
+or your own fork. Run `git submodule sync` and `git submodule update` after doing this.
 
 #### Way 2: Package
 ```sh
@@ -108,7 +104,7 @@ Replace 6 with the RTEMS version used. For the git way, 6 was used.
 
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
-../source-builder/sb-set-builder --prefix=$RTEMS_TOOLS $RTEMS_VERSION/rtems-sparc
+../source-builder/sb-set-builder --prefix=$RTEMS_PREFIX $RTEMS_VERSION/rtems-sparc
 ```
 
 This command will install the tools at the prefix path.
@@ -126,13 +122,13 @@ The `sparc/erc32` BSP can be built with the following command (replace 6 with wh
 
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
-../source-builder/sb-set-builder --prefix=$RTEMS_TOOLS --target=sparc-rtems6 --with-rtems-bsp=erc32 --with-rtems-tests=yes 6/rtems-kernel
+../source-builder/sb-set-builder --prefix=$RTEMS_PREFIX--target=sparc-rtems6 --with-rtems-bsp=erc32 --with-rtems-tests=yes 6/rtems-kernel
 ```
 
 The BSP tests can be run with the following command
 
 ```sh
-cd $RTEMS_INST
+cd $RTEMS_PREFIX
 bin/rtems-test --rtems-bsp=erc32-sis sparc-rtems6/erc32/tests
 ```
 
@@ -141,7 +137,7 @@ bin/rtems-test --rtems-bsp=erc32-sis sparc-rtems6/erc32/tests
 The tools required to build `sparc` BSPs have been installed so we can also build the erc32 BSP from sources.
 
 ```sh
-cd $RTEMS_TOOLS/src/rtems
+cd src/rtems
 ```
 
 Create a `config.ini` file with the following content
@@ -154,7 +150,7 @@ BUILD_TESTS = True
 Run the following command to build the BSP
 
 ```sh
-./waf configure --prefix=$RTEMS_TOOLS
+./waf configure --prefix=$RTEMS_PREFIX
 ./waf
 ./waf install
 ```
@@ -173,12 +169,12 @@ git clone https://github.com/rmspacefish/rtems.git
 
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
-../source_builder/sb-set-builder --prefix=$RTEMS_TOOLS $RTEMS_VERSION/rtems-arm
+../source_builder/sb-set-builder --prefix=$RTEMS_PREFIX $RTEMS_VERSION/rtems-arm
 ```
 
 Succesfull installation can be verified with
 ```sh
-$RTEMS_INST/bin/arm-rtems<version>-gcc --version
+$RTEMS_PREFIX/bin/arm-rtems$RTEMS_VERSION-gcc --version
 ```
 
 ### 4. Building the stm32h7 BSP
@@ -186,7 +182,7 @@ $RTEMS_INST/bin/arm-rtems<version>-gcc --version
 The BSP can not be built with the source builder and has to be built directly from sources. As a first step, the configuration file to configure the BSP build needs to be copied to the rtems source.
 
 ```sh
-cp $RTEMS_TOOLS/samples/arm_stm32/config.ini $RTEMS_TOOLS/src/rtems
+cp $RTEMS_TOOLS_REPO/samples/arm_stm32/config.ini $RTEMS_TOOLS/src/rtems
 ```
 To display the default BSP configure build options for the specific BSP, the following command can be used
 
@@ -199,8 +195,8 @@ following commands
 
 
 ```sh
-cd $RTEMS_TOOLS/src/rtems
-./waf configure --prefix=$RTEMS_TOOLS
+cd $RTEMS_PREFIX/src/rtems
+./waf configure --prefix=$RTEMS_PREFIX
 ./waf
 ./waf install
 ```
