@@ -8,10 +8,50 @@ this folder from the sources which have been added a submodules.
 The steps are closely related to the steps specified in the [Quick Start](https://docs.rtems.org/branches/master/user/start/index.html).
 
 The RTEMS prefix where the tools and BSPs will be installed  will be referred with `$RTEMS_PREFIX`.
-The repository will be referred with `$RTEMS_TOOLS_REPO`.
+The repository will be referred with `$RTEMS_TOOLS`.
 The RTEMS version number will be referred to as `$RTEMS_VERSION`.
 
 ## Prerequisites
+
+### Setting up the installation prefix
+
+Set the installation prefix. In this case, use the current folder
+and run the following command inside the `$RTEMS_TOOLS` path.
+When using the git sources directly, it is recommended to take the RTEMS version 6.
+
+```sh
+export RTEMS_PREFIX=$RTEMS_TOOLS_REPO/rtems/$RTEMS_VERSION
+```
+
+Test with `echo $RTEMS_PREFIX`
+
+### Obtain the sources
+
+I used the Releases for now as specified in 
+[the quickstart guide](https://docs.rtems.org/branches/master/user/start/sources.html).
+Navigate into `$RTEMS_TOOLS` first. We are going to build from the master branch now, using git.
+The RTEMS sources for the RSB and the kernel are already integrated in this repository as 
+submodules:
+
+```sh
+git submodule init
+git submodule sync
+git submodule update
+cd src
+```
+
+The submodules are forks of the RSB and the kernel. It is also possible to replace with master 
+branches by editing the `.gitmodules` file and replacing the URLs with either the master 
+or your own fork. Run `git submodule sync` and `git submodule update` after doing this.
+Alternatively, navigate into the forks and run the following commands to add the upstreams 
+for updates
+
+```sh
+cd rtems
+git remote add upstream https://github.com/RTEMS/rtems.git
+git merge upstream/master
+```
+
 
 ### Ubuntu
 Flex and Bison are used. Furthermore, the python-dev package should be installed.
@@ -36,55 +76,9 @@ If there is a problem with the encoding with the python tools, run
 export PYTHONIOENCODING=UTF-8
 ```
 
-## Installing RTEMS - Demo application
+## Installing RTEMS - Demo application (rtems-sparc with the sparc/erc32 BSP)
 
-### 1. Setting installation prefix
-
-Set the installation prefix. In this case, use the current folder
-and run the following command inside the `$RTEMS_TOOLS` path.
-When using the git sources directly, it is recommended to take the RTEMS version 6.
-
-```sh
-export RTEMS_PREFIX=$RTEMS_TOOLS_REPO/rtems/$RTEMS_VERSION
-```
-
-Test with `echo $RTEMS_PREFIX`
-
-### 2. Obtain the sources
-
-I used the Releases for now as specified in 
-[the quickstart guide](https://docs.rtems.org/branches/master/user/start/sources.html).
-Navigate into `$RTEMS_TOOLS` first.
-
-#### Way 1: Git
-
-The RTEMS sources for the RSB and the kernel are already integrated in this repository as 
-submodules:
-
-```sh
-git submodule init
-git submodule sync
-git submodule update
-cd src
-```
-
-The submodules are forks of the RSB and the kernel. It is also possible to replace with master 
-branches by editing the `.gitmodules` file and replacing the URLs with either the master 
-or your own fork. Run `git submodule sync` and `git submodule update` after doing this.
-
-#### Way 2: Package
-```sh
-mkdir src
-cd src
-curl https://ftp.rtems.org/pub/rtems/releases/5/5.1/sources/rtems-source-builder-5.1.tar.xz | tar xJf -
-```
-
-After that, the folder can be renamed 
-```sh
-mv rtems-source-builder5.1 rsb
-```
-
-### 3. Installing the RTEMS sparc Tool Suite
+### 1. Installing the RTEMS `sparc` Tool Suite
 
 First, check whether the `rsb` software is set up properly:
 
@@ -109,30 +103,14 @@ cd $RTEMS_TOOLS/src/rsb/rtems
 
 This command will install the tools at the prefix path.
 Succesfull installation can be verified with
-```sh
-$RTEMS_TOOLS/bin/sparc-rtems<version>-gcc --version
-```
-
-### 4. Building the erc32 Board Support Package (BSP)
-
-#### Way 1: Package
-After installing the tool suite for the sparc architecture, the BSP for `erc32` should be built to produce binaries which can be run with the `erc32-sis` simulator.
-
-The `sparc/erc32` BSP can be built with the following command (replace 6 with whatever version number is used). Building the test is optional:
 
 ```sh
-cd $RTEMS_TOOLS/src/rsb/rtems
-../source-builder/sb-set-builder --prefix=$RTEMS_PREFIX--target=sparc-rtems6 --with-rtems-bsp=erc32 --with-rtems-tests=yes 6/rtems-kernel
+$RTEMS_TOOLS/bin/sparc-rtems6-gcc --version
 ```
 
-The BSP tests can be run with the following command
+### 2. Building the `sparc/erc32` Board Support Package (BSP)
 
-```sh
-cd $RTEMS_PREFIX
-bin/rtems-test --rtems-bsp=erc32-sis sparc-rtems6/erc32/tests
-```
-
-#### Way 2: Sources
+#### Build the BSP from RTEMS sources
 
 The tools required to build `sparc` BSPs have been installed so we can also build the erc32 BSP from sources.
 
@@ -156,16 +134,9 @@ Run the following command to build the BSP
 ```
 
 
-## Installing RTEMS - STM32H743ZI Nucleo Blinky
+## Installing RTEMS - STM32H743ZI Nucleo (rtems-arm with the arm/stm32h7 BSP)
 
-Step 1 and step 2 are identical to the steps for the hello program, but the git way has to be used because the arm/stm32h7 BSP can only be found in the master branch of RTEMS. Also, it is recommended to 
-clone a fork of the RTEMS repo to get the correct configuration for the nucleo board:
-
-```sh
-git clone https://github.com/rmspacefish/rtems.git
-```
-
-### 3. Installing the RTEMS arm Tool Suite
+### 1. Installing the RTEMS `arm` Tool Suite
 
 ```sh
 cd $RTEMS_TOOLS/src/rsb/rtems
@@ -174,17 +145,21 @@ cd $RTEMS_TOOLS/src/rsb/rtems
 
 Succesfull installation can be verified with
 ```sh
-$RTEMS_PREFIX/bin/arm-rtems$RTEMS_VERSION-gcc --version
+$RTEMS_PREFIX/bin/arm-rtems6-gcc --version
 ```
 
-### 4. Building the stm32h7 BSP
+### 2. Building the `arm/stm32h7` BSP
 
-The BSP can not be built with the source builder and has to be built directly from sources. As a first step, the configuration file to configure the BSP build needs to be copied to the rtems source.
+The BSP can not be built with the source builder and has to be built directly from sources. 
+As a first step, the configuration file to configure the BSP build needs to be copied to the 
+rtems source.
 
 ```sh
 cp $RTEMS_TOOLS_REPO/samples/arm_stm32/config.ini $RTEMS_TOOLS/src/rtems
 ```
-To display the default BSP configure build options for the specific BSP, the following command can be used
+
+To display the default BSP configure build options for the specific BSP, the following command 
+can be used
 
 ```sh
 ./waf bsp_defaults --rtems-bsp=arm/stm32h7
@@ -200,4 +175,18 @@ cd $RTEMS_PREFIX/src/rtems
 ./waf
 ./waf install
 ```
+
+## Setting up the environment
+
+Lastly, it is recommended to add the following lines to your `.bashrc` or `.profile` file in 
+the home directory (Linux, MinGW64) or set them up in your System Environmental variables
+(Windows). Replace `$RTEMS_PREFIX` with your RTEMS prefix. This saves you the work of always
+having to specify the full path to the toolchain binaries or having to type out the full prefix.
+
+```sh
+export RTEMS_VERSION=6
+export RTEMS_PREFIX=$RTEMS_PREFIX
+export PATH=$PATH:"$RTEMS_PREFIX/bin"
+```
+
 
