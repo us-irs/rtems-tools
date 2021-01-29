@@ -155,7 +155,7 @@ As a first step, the configuration file to configure the BSP build needs to be c
 rtems source.
 
 ```sh
-cp $RTEMS_TOOLS_REPO/samples/arm_stm32/config.ini $RTEMS_TOOLS/src/rtems
+cp $RTEMS_TOOLS/samples/arm_stm32/config.ini $RTEMS_TOOLS/src/rtems
 ```
 
 To display the default BSP configure build options for the specific BSP, the following command 
