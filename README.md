@@ -57,7 +57,7 @@ git merge upstream/master
 Flex and Bison are used. Furthermore, the python-dev package should be installed.
 
 ```sh
-sudo apt-get install flex bison python-dev
+sudo apt-get install flex bison python-dev texinfo
 ```
 
 ### Windows
