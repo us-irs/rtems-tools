@@ -67,7 +67,8 @@ After that, it is recommended to set an alias in `.bashrc` to the RTEMS repo pat
 After that, all required packages should be installed:
 
 ```sh
-pacman -S python mingw-w64-x86_64-python2 mingw-w64-x86_64-gcc bison cvs diffutils git make patch tar texinfo unzip flex
+pacman -S python mingw-w64-x86_64-python2 mingw-w64-x86_64-gcc bison cvs diffutils git make \
+	patch tar texinfo unzip flex
 ```
 
 If there is a problem with the encoding with the python tools, run
