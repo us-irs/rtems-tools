@@ -1,5 +1,0 @@
-export RTEMS_VERSION=5
-
-export PATH="$PATH":"$(pwd)/rtems/$RTEMS_VERSION/bin"
-export RTEMS_TOOLS="$(pwd)/rtems/$RTEMS_VERSION"
-
