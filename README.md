@@ -152,7 +152,7 @@ $RTEMS_PREFIX/bin/arm-rtems6-gcc --version
 
 The BSP can not be built with the source builder and has to be built directly from sources. 
 As a first step, the configuration file to configure the BSP build needs to be copied to the 
-rtems source.
+rtems source. If you use a Nucleo board, you can use the `arm/nucleo-h743zi` BSP as well.
 
 ```sh
 cp $RTEMS_TOOLS/samples/arm_stm32/config.ini $RTEMS_TOOLS/src/rtems
